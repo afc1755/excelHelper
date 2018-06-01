@@ -4,7 +4,6 @@ def converter(inputFile, outputFile, startTime, date):
     actArr = []
     actArr.append([])
     animDict = {}
-    colNum = 0
     rdWB = openpyxl.load_workbook(inputFile)
     book = openpyxl.load_workbook(outputFile)
     newSheet = book.worksheets[0]
@@ -41,31 +40,34 @@ def converter(inputFile, outputFile, startTime, date):
     x = 4
     animNum = worksheet.cell(row = 5, column = 3).value
     animDict[animNum] = []
-    while worksheet.cell(row=(x + 1), column=1).value != "Result 1":
+    cellVal = worksheet.cell(row=(x + 1), column=1).value
+    while worksheet.cell(row=(x + 1), column=1).value == "Result 1":
         if animNum == worksheet.cell(row = x + 1,column = 3).value:
             animDict[animNum].append(worksheet.cell(row=x + 1, column=6).value)
         else:
             animNum = worksheet.cell(row = x + 1, column = 3).value
             animDict[animNum] = []
             animDict[animNum].append(worksheet.cell(row=x + 1,column=6).value)
+        x += 1
     animNumSheet = 2
     startI = int(startTime[:2]) * 60 + int(startTime[3:]) + 300
     animList = animDict.keys()
     animListNum = 0
     currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
-    while currCellVal != "":
+    while isinstance(currCellVal, float) or isinstance(currCellVal, int):
         currCellVal = newSheet.cell(row=startI + 1,column=animNumSheet + 1).value
         startI += 1
     currCount = 0
     for lst in animList:
         i = startI
         for count in range(len(animDict) + 1):
-            if newSheet.cell(row=1, column=count + 1).value == animList[animListNum]:
+            if newSheet.cell(row=1, column=count + 1).value == lst:
                 currCount = count
-        for data in lst:
-            newSheet.cell(row=i + 1, column=count + 1).value= data
-    rdWB.save()
-    book.save()
+        for data in animDict[lst]:
+            newSheet.cell(row=i + 1, column=currCount + 1).value= data
+            currCount += 1
+    rdWB.save(inputFile)
+    book.save(outputFile)
 
 
 def test():
