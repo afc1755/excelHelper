@@ -1,6 +1,6 @@
 import openpyxl
 
-def converter(inputFile, outputFile, startTime, date):
+def converter(inputFile, outputFile, startTime, date, buffer):
     actArr = []
     actArr.append([])
     animDict = {}
@@ -63,27 +63,39 @@ def converter(inputFile, outputFile, startTime, date):
         for count in range(len(animDict) + 1):
             if newSheet.cell(row=1, column=count + 1).value == lst:
                 currCount = count
+        for gapCount in range(int(buffer)):
+            newSheet.cell(row=i + 1, column=gapCount+currCount+1).value = -1
+        currCount = int(buffer) + currCount
         for data in animDict[lst]:
-            newSheet.cell(row=i + 1, column=currCount + 1).value= data
+            newSheet.cell(row=i + 1, column=currCount + 1).value = data
             currCount += 1
+
+    if(date != "" and startTime != ""):
+        for lst in animList:
+            currFile = open(lst + ".awd", 'w')
+
+            for data in animDict[lst]:
+                currFile.write(data)
+
     rdWB.save(inputFile)
     book.save(outputFile)
 
 
 def test():
     print("Test!")
-    converter("ex.xlsx", "Checktime.xlsx", "19:00", "05/18/2018")
+    converter("ex.xlsx", "Checktime.xlsx", "19:00", "05/18/2018", 3)
 
 
 def main():
     inputFile = input("Enter input file (ex: rawInput): ")
     outputFile = input("Enter output file (ex: output): ")
-    startTime = input("Please enter start time of first day (ex: 09:16,23:14): ")
-    date = input("Please enter date (ex: 01/02/1970) :")
-    # longInput = input("Enter daily stop times and gap between days (ex. 09:16,04;08:15,05... hh:mm,mm;hh:mm,mm): ")
-    # dayArray = longInput.split(";")
-    # camNum = input("Enter Camera #(ex: 1): ")
-    converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date)  # , dayArray, camNum)
-
+    startTime = input("Please enter start time of first day (ex: 09:16,23:14)(leave blank if you do not want awd files generated): ")
+    if startTime != "":
+        date = input("Please enter date (ex: 01/02/1970): ")
+        print("AWDs will be generated in format: <column name>.awd")
+    else:
+        date = ""
+    buffer = input("Please enter gap in minutes between today and yesterday(time that camera stopped; ex: 3):")
+    converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, buffer)
 
 test()
