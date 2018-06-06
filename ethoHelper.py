@@ -5,6 +5,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     actArr = []
     actArr.append([])
     animDict = {}
+
     print("Opening excel workbooks...")
     rdWB = openpyxl.load_workbook(inputFile)
     book = openpyxl.load_workbook(outputFile)
@@ -13,6 +14,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     x = 4
     animNum = worksheet.cell(row = 5, column = 3).value
     animDict[animNum] = []
+
     print("Creating internal data storage...")
     while worksheet.cell(row=(x + 1), column=1).value == "Result 1":
         if animNum == worksheet.cell(row = x + 1,column = 3).value:
@@ -22,14 +24,16 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
             animDict[animNum] = []
             animDict[animNum].append(worksheet.cell(row=x + 1,column=6).value)
         x += 1
+
     animNumSheet = 2
-    startI = int(startTime[:2]) * 60 + int(startTime[3:]) + 300
+    startI = int(startTime[:2]) * 60 + int(startTime[3:]) + 1
     animList = animDict.keys()
     currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
     while isinstance(currCellVal, float) or isinstance(currCellVal, int):
         currCellVal = newSheet.cell(row=startI + 1,column=animNumSheet + 1).value
         startI += 1
     currCount = 0
+
     print("Appending to checktime file...")
     for lst in animList:
         i = startI
@@ -47,6 +51,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     rdWB.save(inputFile)
     print("Saving " + outputFile)
     book.save(outputFile)
+
     if(date != "" and startTime != ""):
         if not os.path.exists(awdFolder):
             os.mkdir(awdFolder)
@@ -95,4 +100,4 @@ def main():
         awdFolder = ""
     converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, awdFolder, buffer)
 
-test()
+main()
