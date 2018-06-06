@@ -63,7 +63,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
             for zeroC in range(6):
                 currFile.write("0\n")
             for data in animDict[lst]:
-                currFile.write(str(data))
+                currFile.write(str(data) + '\n')
             currFile.close()
 
 def test():
@@ -94,4 +94,4 @@ def main():
         awdFolder = ""
     converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, awdFolder, buffer)
 
-main()
+test()
