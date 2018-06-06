@@ -1,46 +1,19 @@
-import openpyxl
+import openpyxl, os
 
-def converter(inputFile, outputFile, startTime, date, buffer):
+#Python program that adds raw ethovision output into a checktime file and optionally creates awd files for each animal
+def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     actArr = []
     actArr.append([])
     animDict = {}
+    print("Opening excel workbooks...")
     rdWB = openpyxl.load_workbook(inputFile)
     book = openpyxl.load_workbook(outputFile)
     newSheet = book.worksheets[0]
     worksheet = rdWB.worksheets[0]
-    """hFont = xlwt.Font()
-    hFont.bold = True
-    bAlign = xlwt.Alignment()
-    bAlign.horz = xlwt.Alignment.HORZ_LEFT
-    rAlign = xlwt.Alignment()
-    rAlign.horz = xlwt.Alignment.HORZ_RIGHT
-    hrStyle = xlwt.XFStyle()
-    hrStyle.font = hFont
-    hrStyle.alignment = bAlign
-    dayStyle = xlwt.XFStyle()
-    dayStyle.alignment = bAlign
-    minStyle = xlwt.XFStyle()
-    minStyle.alignment = rAlign
-    workbook = xlwt.Workbook()
-    ws = workbook.add_sheet("checkTime")
-    hourNum = 0
-    dayNum = 0
-    while hourNum < 2400:
-        minuteNum = 1
-        ws.write(colNum, 1, "Day" + str(dayNum), dayStyle)
-        ws.write(colNum, 2, str(hourNum), hrStyle)
-        hourNum += 100
-        colNum += 1
-        while minuteNum < 60:
-            ws.write(colNum, 1, "Day" + str(dayNum), dayStyle)
-            ws.write(colNum, 2, str(minuteNum), minStyle)
-            minuteNum += 1
-            colNum += 1
-    """
     x = 4
     animNum = worksheet.cell(row = 5, column = 3).value
     animDict[animNum] = []
-    cellVal = worksheet.cell(row=(x + 1), column=1).value
+    print("Creating internal data storage...")
     while worksheet.cell(row=(x + 1), column=1).value == "Result 1":
         if animNum == worksheet.cell(row = x + 1,column = 3).value:
             animDict[animNum].append(worksheet.cell(row=x + 1, column=6).value)
@@ -52,12 +25,12 @@ def converter(inputFile, outputFile, startTime, date, buffer):
     animNumSheet = 2
     startI = int(startTime[:2]) * 60 + int(startTime[3:]) + 300
     animList = animDict.keys()
-    animListNum = 0
     currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
     while isinstance(currCellVal, float) or isinstance(currCellVal, int):
         currCellVal = newSheet.cell(row=startI + 1,column=animNumSheet + 1).value
         startI += 1
     currCount = 0
+    print("Appending to checktime file...")
     for lst in animList:
         i = startI
         for count in range(len(animDict) + 1):
@@ -69,33 +42,56 @@ def converter(inputFile, outputFile, startTime, date, buffer):
         for data in animDict[lst]:
             newSheet.cell(row=i + 1, column=currCount + 1).value = data
             currCount += 1
-
-    if(date != "" and startTime != ""):
-        for lst in animList:
-            currFile = open(lst + ".awd", 'w')
-
-            for data in animDict[lst]:
-                currFile.write(data)
-
+    print("Saving " + inputFile)
     rdWB.save(inputFile)
+    print("Saving " + outputFile)
     book.save(outputFile)
-
+    if(date != "" and startTime != ""):
+        if not os.path.exists(awdFolder):
+            os.mkdir(awdFolder)
+        for lst in animList:
+            path = awdFolder + "\\" + lst + ".awd"
+            print("Generating awd file: " + path)
+            currFile = open(path, 'w')
+            currFile.write(lst + '\n')
+            currFile.write(date + '\n')
+            currFile.write(startTime + '\n')
+            currFile.write("4\n")
+            currFile.write("0\n")
+            currFile.write("Ignore\n")
+            currFile.write("M\n")
+            for zeroC in range(6):
+                currFile.write("0\n")
+            for data in animDict[lst]:
+                currFile.write(str(data))
+            currFile.close()
 
 def test():
     print("Test!")
-    converter("ex.xlsx", "Checktime.xlsx", "19:00", "05/18/2018", 3)
-
+    converter("ex.xlsx", "Checktime.xlsx", "19:00", "05/18/2018", "AWDFiles", 3)
 
 def main():
-    inputFile = input("Enter input file (ex: rawInput): ")
-    outputFile = input("Enter output file (ex: output): ")
-    startTime = input("Please enter start time of first day (ex: 09:16,23:14)(leave blank if you do not want awd files generated): ")
-    if startTime != "":
-        date = input("Please enter date (ex: 01/02/1970): ")
-        print("AWDs will be generated in format: <column name>.awd")
+    inputFile = ""
+    outputFile = ""
+    buffer = ""
+    startTime = ""
+    while inputFile == "":
+        inputFile = input("Enter Ethovision output file (ex: rawInput): ")
+    while outputFile == "":
+        outputFile = input("Enter Checktime file (ex: checktime): ")
+    while buffer == "":
+        buffer = input("Please enter gap in minutes between today and yesterday(time that camera stopped; ex: 3):")
+    while startTime == "":
+        startTime = input("Please enter start time of first day(ex: 09:16,23:14): ")
+    date = input("Please enter start date (Leave blank for no AWD file creation)(ex: 01/02/1970): ")
+    if date != "":
+        print("AWDs will be generated in format: <folder name>/<column name>.awd")
+        awdFolder = input("Please enter folder name for AWD file storage(default: AWDFiles): ")
+        if awdFolder == "":
+            awdFolder = "AWDFiles"
     else:
         date = ""
-    buffer = input("Please enter gap in minutes between today and yesterday(time that camera stopped; ex: 3):")
-    converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, buffer)
+        awdFolder = ""
+    converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, awdFolder, buffer)
 
-test()
+main()
