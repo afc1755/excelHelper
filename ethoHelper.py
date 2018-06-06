@@ -16,13 +16,17 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     animDict[animNum] = []
 
     print("Creating internal data storage...")
+    correctCol = 5
+    for col in range(5, 10):
+        if (isinstance(worksheet.cell(x + 1, col).value, float)):
+            correctCol = col
     while worksheet.cell(row=(x + 1), column=1).value == "Result 1":
         if animNum == worksheet.cell(row = x + 1,column = 3).value:
             animDict[animNum].append(worksheet.cell(row=x + 1, column=6).value)
         else:
             animNum = worksheet.cell(row = x + 1, column = 3).value
             animDict[animNum] = []
-            animDict[animNum].append(worksheet.cell(row=x + 1,column=6).value)
+            animDict[animNum].append(worksheet.cell(row=x + 1,column=correctCol).value)
         x += 1
 
     animNumSheet = 2
