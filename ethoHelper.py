@@ -37,10 +37,10 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
             if newSheet.cell(row=1, column=count + 1).value == lst:
                 currCount = count
         for gapCount in range(int(buffer)):
-            newSheet.cell(row=gapCount+i+1, column=currCount + 1).value = -1
+            newSheet.cell(row=gapCount+i, column=currCount + 1).value = -1
         i = int(buffer) + i
         for data in animDict[lst]:
-            newSheet.cell(row=i + 1, column=currCount + 1).value = data
+            newSheet.cell(row=i, column=currCount + 1).value = data
             i += 1
 
     print("Saving " + inputFile)
