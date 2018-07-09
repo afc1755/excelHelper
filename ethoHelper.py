@@ -33,7 +33,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     startI = int(startTime[:2]) * 60 + int(startTime[3:]) + 2
     animList = animDict.keys()
     currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
-    while isinstance(currCellVal, float) or isinstance(currCellVal, int):
+    while isinstance(currCellVal, float) or isinstance(currCellVal, int) or currCellVal == "-":
         currCellVal = newSheet.cell(row=startI + 1,column=animNumSheet + 1).value
         startI += 1
     currCount = 0
