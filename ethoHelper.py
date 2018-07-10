@@ -73,7 +73,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
                 currFile.write("M\n")
             else:
                 currFile = open(path, 'a')
-            for gC in range(buffer):
+            for gC in range(int(buffer)):
                 currFile.write("-1\n")
             for data in animDict[lst]:
                 currFile.write(str(data) + '\n')
