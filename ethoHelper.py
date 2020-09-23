@@ -22,10 +22,10 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
         if isinstance(worksheet.cell(x + 1, col).value, float) or isinstance(worksheet.cell(x + 1, col).value, int):
             correctCol = col
     while worksheet.cell(row=(x + 1), column=1).value is not None:
-        if animNum == worksheet.cell(row=x + 1, column=3).value:
+        if animNum == worksheet.cell(row=x + 1, column=2).value:
             animDict[animNum].append(worksheet.cell(row=x + 1, column=correctCol).value)
         else:
-            animNum = worksheet.cell(row=x + 1, column=3).value
+            animNum = worksheet.cell(row=x + 1, column=2).value
             animDict[animNum] = []
             animDict[animNum].append(worksheet.cell(row=x + 1, column=correctCol).value)
         x += 1
