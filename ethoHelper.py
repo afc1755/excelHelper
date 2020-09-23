@@ -1,6 +1,7 @@
 import openpyxl, os
 
-#Python program that adds raw ethovision output into a checktime file and optionally creates awd files for each animal
+
+# Python program that adds raw ethovision output into a checktime file and optionally creates awd files for each animal
 def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     actArr = []
     actArr.append([])
@@ -12,21 +13,21 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     newSheet = book.worksheets[0]
     worksheet = rdWB.worksheets[0]
     x = 4
-    animNum = worksheet.cell(row = 5, column = 3).value
+    animNum = worksheet.cell(row=5, column=2).value
     animDict[animNum] = []
 
     print("Creating internal data storage...")
-    correctCol = 5
-    for col in range(5, 10):
-        if (isinstance(worksheet.cell(x + 1, col).value, float) or isinstance(worksheet.cell(x + 1, col).value, int)):
+    correctCol = 4
+    for col in range(4, 10):
+        if isinstance(worksheet.cell(x + 1, col).value, float) or isinstance(worksheet.cell(x + 1, col).value, int):
             correctCol = col
-    while worksheet.cell(row=(x+1),column=1).value != None:
-        if animNum == worksheet.cell(row = x + 1,column = 3).value:
+    while worksheet.cell(row=(x + 1), column=1).value is not None:
+        if animNum == worksheet.cell(row=x + 1, column=3).value:
             animDict[animNum].append(worksheet.cell(row=x + 1, column=correctCol).value)
         else:
-            animNum = worksheet.cell(row = x + 1, column = 3).value
+            animNum = worksheet.cell(row=x + 1, column=3).value
             animDict[animNum] = []
-            animDict[animNum].append(worksheet.cell(row=x + 1,column=correctCol).value)
+            animDict[animNum].append(worksheet.cell(row=x + 1, column=correctCol).value)
         x += 1
 
     animNumSheet = 2
@@ -34,7 +35,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     animList = animDict.keys()
     currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
     while isinstance(currCellVal, float) or isinstance(currCellVal, int) or currCellVal == "-":
-        currCellVal = newSheet.cell(row=startI + 1,column=animNumSheet + 1).value
+        currCellVal = newSheet.cell(row=startI + 1, column=animNumSheet + 1).value
         startI += 1
     currCount = 0
 
@@ -45,7 +46,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
             if newSheet.cell(row=1, column=count + 1).value == lst:
                 currCount = count
         for gapCount in range(int(buffer)):
-            newSheet.cell(row=gapCount+i, column=currCount + 1).value = -1
+            newSheet.cell(row=gapCount + i, column=currCount + 1).value = -1
         i = int(buffer) + i
         for data in animDict[lst]:
             newSheet.cell(row=i, column=currCount + 1).value = data
@@ -56,7 +57,7 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
     print("Saving " + outputFile)
     book.save(outputFile)
 
-    if(date != "" and startTime != ""):
+    if date != "" and startTime != "":
         if not os.path.exists(awdFolder):
             os.mkdir(awdFolder)
         for lst in animList:
@@ -78,9 +79,12 @@ def converter(inputFile, outputFile, startTime, date, awdFolder, buffer):
             for data in animDict[lst]:
                 currFile.write(str(data) + '\n')
             currFile.close()
+
+
 def test():
     print("Test!")
     converter("ex.xlsx", "Checktime.xlsx", "19:00", "05/18/2018", "AWDFiles", 3)
+
 
 def main():
     inputFile = ""
@@ -105,5 +109,6 @@ def main():
         date = ""
         awdFolder = ""
     converter(inputFile + ".xlsx", outputFile + ".xlsx", startTime, date, awdFolder, buffer)
+
 
 main()
